@@ -21,17 +21,6 @@ class Local(Algorithme):
                 popIndex[1] = random.randint(0, len(solution_allowed) - 1)
         print("\npopIndex: " + str(popIndex[-1]))
 
-        targetIndex.append(random.randint(0, len(solution_allowed[popIndex[-1]]) - 1))
-        cpt_target = len(solution_allowed[popIndex[-1]])
-        while targetIndex[-1] in solution:
-            print("deux solution trouvée: " + str(targetIndex[-1]) + " dans " + str(solution))
-            if len(solution_allowed[popIndex[-1]]) == 1 or cpt_target == 0:
-                return rev, capacite
-            else:
-                targetIndex[-1] = random.randint(0, len(solution_allowed[popIndex[-1]]) - 1)
-                cpt_target -=1
-        print("targetIndex " + str(targetIndex[-1]))
-
         print("rev: " + str(rev))
         print("capa: " + str(capacite))
         rev = rev - int(data[popIndex[-1], 0])
@@ -42,6 +31,11 @@ class Local(Algorithme):
         print("init_solution avant " + str(solution))
         del (solution[popIndex[-1]])
         print("init_solution apres " + str(solution))
+
+
+        targetIndex.append(random.randint(0, len(solution_allowed[popIndex[-1]]) - 1))
+
+        print("targetIndex " + str(targetIndex[-1]))
 
         solution.append(targetIndex[-1])
         print("init_solution " + str(solution))
@@ -56,9 +50,6 @@ class Local(Algorithme):
     def resolve(self, data, maxQ,  options = {"defaut": True}):
 
         solution, init_result = self.glouton.resolve(data, maxQ, options)
-
-        for i in range(len(solution)):
-            solution[i] -=1
 
         rev_init, capacite_init = self.getTotal(data, solution)
 
@@ -129,9 +120,8 @@ class Local(Algorithme):
 
                 if len(solution_allowed) == 0:
                     optimum_local = True
-
-        return [x + 1 for x in sorted(solution[:])], rev_init
-
+                    print("optimum local: ")
+                    print("solution: {} revenue: {} capacite: {}".format(str(solution),str(rev_init),str(capacite)))
 
 if __name__ == "__main__":
 
@@ -139,8 +129,8 @@ if __name__ == "__main__":
     print("options :" + str(options))
     local = Local()
     data = local.getDataFromPath(
-        "/home/gregoire/Documents/INF8775/TP/tp2/exemplaires/WC-1000-100-01.txt")
-    debut = time.time()
-    solutions, revenu = local.resolve(data[0], data[1])
-    print("solutions: {} revenus: {} temps: {}".format(solutions, revenu, time.time() - debut))
+        "/home/gregoire/Documents/INF8775/TP/tp2/exemplaires/WC-100-10-01.txt")
+    print(data)
+    while True:
+        local.resolve(data[0], data[1])
     #local.optionsHandler(options)
