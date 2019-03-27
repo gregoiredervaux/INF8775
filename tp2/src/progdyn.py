@@ -1,5 +1,6 @@
 from Algorithme import *
 import numpy as np
+import time
 
 
 
@@ -36,4 +37,14 @@ class Progdyn(Algorithme):
                 i = i - 1
         return sorted(result), maxResult
 
+if __name__ == "__main__":
 
+    options = sys.argv[2:]
+    print("options :" + str(options))
+    algo = Progdyn()
+    data = algo.getDataFromPath(
+        "/home/gregoire/Documents/INF8775/TP/tp2/exemplaires/WC-1000-100-01.txt")
+    debut = time.time()
+    solutions, revenu= algo.resolve(data[0], data[1])
+    print("solutions: {}\n revenus: {}\n temps: {}".format(solutions, revenu, time.time() - debut))
+    #local.optionsHandler(options)

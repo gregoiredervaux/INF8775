@@ -19,23 +19,23 @@ class Local(Algorithme):
         if len(popIndex) == 2:
             while popIndex[0] == popIndex[1]:
                 popIndex[1] = random.randint(0, len(solution_allowed) - 1)
-        print("\npopIndex: " + str(popIndex[-1]))
+        print("\npopIndex: " + str(popIndex[-1]) + " parmis " + str(len(solution_allowed) - 1))
 
         targetIndex.append(random.randint(0, len(solution_allowed[popIndex[-1]]) - 1))
         cpt_target = len(solution_allowed[popIndex[-1]])
-        while targetIndex[-1] in solution:
+        while solution_allowed[popIndex[-1]][targetIndex[-1]] in solution:
             print("deux solution trouvée: " + str(targetIndex[-1]) + " dans " + str(solution))
             if len(solution_allowed[popIndex[-1]]) == 1 or cpt_target == 0:
                 return rev, capacite
             else:
                 targetIndex[-1] = random.randint(0, len(solution_allowed[popIndex[-1]]) - 1)
                 cpt_target -=1
-        print("targetIndex " + str(targetIndex[-1]))
+        print("targetIndex " + str(targetIndex[-1]) + " parmis " + str(len(solution_allowed[popIndex[-1]]) - 1))
 
         print("rev: " + str(rev))
         print("capa: " + str(capacite))
-        rev = rev - int(data[popIndex[-1], 0])
-        capacite = capacite - int(data[popIndex[-1], 1])
+        rev = rev - int(data[solution[popIndex[-1]], 0])
+        capacite = capacite - int(data[solution[popIndex[-1]], 1])
         print("rev del: " + str(rev))
         print("capa del: " + str(capacite))
 
@@ -43,11 +43,11 @@ class Local(Algorithme):
         del (solution[popIndex[-1]])
         print("init_solution apres " + str(solution))
 
-        solution.append(targetIndex[-1])
+        solution.append(solution_allowed[popIndex[-1]][targetIndex[-1]])
         print("init_solution " + str(solution))
 
-        rev = rev + int(data[targetIndex[-1], 0])
-        capacite = capacite + int(data[targetIndex[-1], 1])
+        rev = rev + int(data[solution_allowed[popIndex[-1]][targetIndex[-1]], 0])
+        capacite = capacite + int(data[solution_allowed[popIndex[-1]][targetIndex[-1]], 1])
         print("rev apres " + str(rev))
         print("capacite apres " + str(capacite))
 
@@ -73,7 +73,7 @@ class Local(Algorithme):
             # on crée les solutions possibles
             solution_allowed = []
             for h in range(len(solution)):
-                solution_allowed.append(list(range(1, len(data))))
+                solution_allowed.append(list(range(0, len(data))))
 
             print("solution_allowed_init: " + str(solution_allowed))
 
@@ -130,7 +130,8 @@ class Local(Algorithme):
                 if len(solution_allowed) == 0:
                     optimum_local = True
 
-        return [x + 1 for x in sorted(solution[:])], rev_init
+        print("maxQ: " +str(maxQ))
+        return [x + 1 for x in sorted(solution[:])], rev_init, capacite_init
 
 
 if __name__ == "__main__":
@@ -141,6 +142,6 @@ if __name__ == "__main__":
     data = local.getDataFromPath(
         "/home/gregoire/Documents/INF8775/TP/tp2/exemplaires/WC-1000-100-01.txt")
     debut = time.time()
-    solutions, revenu = local.resolve(data[0], data[1])
-    print("solutions: {} revenus: {} temps: {}".format(solutions, revenu, time.time() - debut))
+    solutions, revenu, capacite = local.resolve(data[0], data[1])
+    print("solutions: {}\n revenus: {}\n capacite: {}\n temps: {}".format(solutions, revenu, capacite, time.time() - debut))
     #local.optionsHandler(options)
