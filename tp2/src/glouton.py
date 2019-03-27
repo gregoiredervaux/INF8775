@@ -24,3 +24,8 @@ class Glouton(Algorithme):
                 best_locations = [x + 1 for x in sorted(solution[:])]
                 best_result = sum(data[solution, 0])
         return best_locations, best_result
+
+if __name__ == "__main__":
+
+    algo = Glouton()
+    algo.optionsHandler(sys.argv[2:])

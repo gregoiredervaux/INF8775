@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+import time
 
 class Algorithme:
 
@@ -42,6 +43,17 @@ class Algorithme:
             capacite += data[index, 1]
         return revenus, capacite
 
+    def printArray(self, array):
+        """
+        affichage d'un array comme demandé dans l'énonce
+        :param array: array a afficher
+        :return: void
+        """
+        string = ""
+        for i in range(len(array)):
+            string = string + str(array[i]) + ' '
+        return string
+
     def resolve(self, data, maxQ,  options = {"defaut": True}):
         pass
 
@@ -54,16 +66,21 @@ class Algorithme:
         if options == None:
             options = sys.argv[2:]
 
+        data, maxQ = self.getDataFromPath(sys.argv[1])
+
+        debut = time.time()
+        arrayRetour = self.resolve(data, maxQ)
+        fin = time.time() - debut
+
         if '-p' in options or '-t' in options:
-
-            data , maxQ = self.getDataFromPath(sys.argv[1])
-
-            arrayRetour = self.resolve(data, maxQ)
 
             if '-p' in options:  # On imprime les nombres triés
 
-                print(arrayRetour[0])
+                print(self.printArray(arrayRetour[0]))
 
             if '-t' in options:  # On imprime le temps d'exécution
-                print(arrayRetour[1])
-
+                print(fin * 1000)
+        else:
+            print("solution: {}\n revenus: {}\n temps de'exécution: {} ms".format(self.printArray(arrayRetour[0]),
+                                                                                  arrayRetour[1],
+                                                                                  fin * 1000))
