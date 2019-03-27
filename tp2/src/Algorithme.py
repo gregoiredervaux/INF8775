@@ -17,6 +17,7 @@ class Algorithme:
         data = data.drop(data.index[len(data) - 1])
         data.index = data['i']
         data = data.drop(['i'], axis=1)
+        data.to_numpy()
         return data, maxQ
 
     def getDataFromPath(self, path):
@@ -27,16 +28,18 @@ class Algorithme:
         data.columns = ['i', 'r', 'q']
         maxQ = data.iloc[len(data) - 1, 0]
         data = data.drop(data.index[len(data) - 1])
-        data.index = data['i']
         data = data.drop(['i'], axis=1)
+        data['R'] = data['r']/data['q']
+        data['p'] = data['R']/sum(data['R'])
+        data = data.to_numpy()
         return data, maxQ
 
     def getTotal(self, data, indexs,  options = {"default": True}):
         revenus = 0
         capacite = 0
         for index in indexs:
-            revenus += data['r'][index]
-            capacite += data['q'][index]
+            revenus += data[index, 0]
+            capacite += data[index, 1]
         return revenus, capacite
 
     def resolve(self, data, maxQ,  options = {"defaut": True}):

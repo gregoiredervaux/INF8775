@@ -5,27 +5,22 @@ import numpy as np
 class Glouton(Algorithme):
 
     def resolve(self, data, maxQ, options = {"defaut": True}):
-        data['R'] = data['r'] / data['q']
-        data['p'] = data['R'] / sum(data['R'])
 
         best_locations = None
         best_result = 0
         for i in range(10):
-            selectionOrder = np.random.choice(range(1, len(data) + 1),
-                                              size=len(data),
-                                              p=data['p'],
-                                              replace=False)
+            selectionOrder = np.random.choice(range(len(data)), size=len(data),
+                                              p=data[:, 3], replace=False)
             solution = []
             currentSpace = maxQ
             counter = -1
-            while currentSpace > 0:
+            while currentSpace > 0 and counter < len(data) - 1:
                 counter += 1
-                if data['q'][selectionOrder[counter]] <= currentSpace:
-                    currentSpace -= data['q'][selectionOrder[counter]]
+                if data[selectionOrder[counter], 1] <= currentSpace:
+                    currentSpace -= data[selectionOrder[counter], 1]
                     solution.append(selectionOrder[counter])
-                    result = sum(data['r'][solution])
+                    result = sum(data[solution, 0])
             if result > best_result:
-                best_locations = solution[:]
-                best_result = sum(data['r'][solution])
-
+                best_locations = [x + 1 for x in sorted(solution[:])]
+                best_result = sum(data[solution, 0])
         return best_locations, best_result
