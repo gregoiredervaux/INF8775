@@ -1,12 +1,12 @@
 from __future__ import print_function
 import glouton
-from Algorithme import *
+import Algorithme
 import random
 import time
 
 
 
-class Local(Algorithme):
+class Local(Algorithme.Algorithme):
 
     def __init__(self):
         super().__init__()
@@ -52,6 +52,8 @@ class Local(Algorithme):
 
         optimum_local = False
         i = 0
+
+        nb_de_poss = len(solution) * len(data)
 
         while not optimum_local:
             # on crée les solutions possibles

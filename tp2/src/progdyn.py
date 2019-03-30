@@ -1,10 +1,14 @@
-from Algorithme import *
+import Algorithme
 import numpy as np
 import time
 
 
 
-class Progdyn(Algorithme):
+class Progdyn(Algorithme.Algorithme):
+
+    def __init__(self):
+        super().__init__()
+        self.name = "progdyn"
 
     def resolve(self, data, maxQ, options={"defaut": True}):
         dynTable = np.zeros((len(data), maxQ + 1))

@@ -1,16 +1,25 @@
-from Algorithme import *
+import Algorithme
 import numpy as np
+import sys
 
 
-class Glouton(Algorithme):
+class Glouton(Algorithme.Algorithme):
+
+    def __init__(self):
+        super().__init__()
+        self.name = "glouton"
 
     def resolve(self, data, maxQ, options = {"defaut": True}):
 
+        R = data[:, 0] / data[:, 1]
+        probVector = R / np.sum(R)
         best_locations = None
         best_result = 0
         for i in range(10):
-            selectionOrder = np.random.choice(range(len(data)), size=len(data),
-                                              p=data[:, 3], replace=False)
+            selectionOrder = np.random.choice(range(len(data)),
+                                              size=len(data),
+                                              p=probVector,
+                                              replace=False)
             solution = []
             currentSpace = maxQ
             counter = -1

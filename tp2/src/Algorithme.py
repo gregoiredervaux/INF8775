@@ -1,31 +1,37 @@
 import sys
 import pandas as pd
 import time
+import csv
 
 class Algorithme:
 
     def __init__(self):
         self.default_path = "/home/gregoire/Documents/INF8775/TP/tp2/"
         self.name = "Algorithme"
+        self.data = []
 
     def getDataFromIndex(self, i, j, k):
         data = pd.read_csv("./exemplaires/WC-{}-{}-{}.txt".format(i, j, k),
                            sep="\n|     |    |   |  | ",
                            skiprows=1,
-                           header=None)
+                           header=None,
+                           engine='python')
         data.columns = ['i', 'r', 'q']
         maxQ = data.iloc[len(data) - 1, 0]
         data = data.drop(data.index[len(data) - 1])
-        data.index = data['i']
         data = data.drop(['i'], axis=1)
-        data.to_numpy()
+        data['R'] = data['r'] / data['q']
+        data['p'] = data['R'] / sum(data['R'])
+        data = data.to_numpy()
+        self.data = data
         return data, maxQ
 
     def getDataFromPath(self, path):
         data = pd.read_csv(path,
                            sep="\n|     |    |   |  | ",
                            skiprows=1,
-                           header=None)
+                           header=None,
+                           engine='python')
         data.columns = ['i', 'r', 'q']
         maxQ = data.iloc[len(data) - 1, 0]
         data = data.drop(data.index[len(data) - 1])
@@ -33,15 +39,22 @@ class Algorithme:
         data['R'] = data['r']/data['q']
         data['p'] = data['R']/sum(data['R'])
         data = data.to_numpy()
+        self.data = data
         return data, maxQ
 
-    def getTotal(self, data, indexs,  options = {"default": True}):
+    def getTotal(self, data, solutions,  options = {"default": True}):
         revenus = 0
         capacite = 0
-        for index in indexs:
-            revenus += data[index, 0]
-            capacite += data[index, 1]
+        for solution in solutions:
+            revenus += data[solution -1, 0]
+            capacite += data[solution -1, 1]
         return revenus, capacite
+
+    def getRendement(self, solutions):
+        rdmt = 0
+        for solution in solutions:
+            rdmt += self.data[solution - 1, 2]
+        return rdmt
 
     def printArray(self, array):
         """
@@ -53,6 +66,22 @@ class Algorithme:
         for i in range(len(array)):
             string = string + str(array[i]) + ' '
         return string
+
+    def execute(self, i, j, k, options={"default": True}):
+
+        """
+        execute l'algoritme sur en ensemble de fichier
+        :param array: l'array des fichers à trier : [1000, 5000, 10 000, ... ]
+        """
+        k = k if k==10 else "0" + str(k)
+        data, maxQ = self.getDataFromPath(
+                     "/home/gregoire/Documents/INF8775/TP/tp2/exemplaires/WC-{}-{}-{}.txt".format(i, j,k)
+        )
+
+        debut = time.time()
+        solution, result = self.resolve(data, maxQ)
+
+        return solution, result, time.time() - debut, maxQ
 
     def resolve(self, data, maxQ,  options = {"defaut": True}):
         pass
