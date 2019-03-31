@@ -10,7 +10,7 @@ def executeHandler(obj, i, j, k):
     with open("data.csv", mode='a') as csvfile:
         c = csv.writer(csvfile)
         c.writerow([obj.name, str(i), str(j), str(k), str(time), str(result), str(rendement), str(maxQ)])
-        print("fait pour algo: {} taille {} serie {} exemple {} en {} ms".format(obj.name,
+        print("fait pour algo: {} taille {} serie {} exemple {} en {} s".format(obj.name,
                                                                                     str(i),
                                                                                     str(j),
                                                                                     str(k),
@@ -32,10 +32,10 @@ if __name__ == '__main__':
 
     for obj in arrayObj:
         print(obj.name)
-        tailles = [10000]
-        series = [100]
-        exemples = [6,7,8,9,10]
-        nb_core = 5
+        tailles = [100, 1000, 10000]
+        series = [10, 100, 1000]
+        exemples = [1,2,3,4,5,6,7,8,9,10]
+        nb_core = 2
         for i in tailles:
             for j in series:
                 for k in range(exemples[0], exemples[-1], nb_core):

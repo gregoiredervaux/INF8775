@@ -2,7 +2,8 @@ from __future__ import print_function
 import glouton
 import Algorithme
 import random
-import time
+import sys
+import numpy as np
 
 
 
@@ -13,95 +14,74 @@ class Local(Algorithme.Algorithme):
         self.name = "local"
         self.glouton = glouton.Glouton()
 
-    def chgmtSolution(self, data, solution, solution_allowed, rev, capacite, popIndex, targetIndex):
-
-        popIndex.append(random.randint(0, len(solution_allowed) - 1))
-        if len(popIndex) == 2:
-            while popIndex[0] == popIndex[1]:
-                popIndex[1] = random.randint(0, len(solution_allowed) - 1)
-
-        targetIndex.append(random.randint(0, len(solution_allowed[popIndex[-1]]) - 1))
-        cpt_target = len(solution_allowed[popIndex[-1]])
-        while solution_allowed[popIndex[-1]][targetIndex[-1]] in solution:
-            if len(solution_allowed[popIndex[-1]]) == 1 or cpt_target == 0:
-                return rev, capacite
-            else:
-                targetIndex[-1] = random.randint(0, len(solution_allowed[popIndex[-1]]) - 1)
-                cpt_target -=1
-
-        rev = rev - int(data[solution[popIndex[-1]], 0])
-        capacite = capacite - int(data[solution[popIndex[-1]], 1])
-
-        del (solution[popIndex[-1]])
-
-        solution.append(solution_allowed[popIndex[-1]][targetIndex[-1]])
-
-        rev = rev + int(data[solution_allowed[popIndex[-1]][targetIndex[-1]], 0])
-        capacite = capacite + int(data[solution_allowed[popIndex[-1]][targetIndex[-1]], 1])
-
-        return rev, capacite
-
     def resolve(self, data, maxQ,  options = {"defaut": True}):
 
-        solution, init_result = self.glouton.resolve(data, maxQ, options)
+        best_locations = self.glouton.resolve(data, maxQ)[0]
+        best_solution = [x - 1 for x in best_locations]
+        R = data[:, 0] / data[:, 1]
 
-        for i in range(len(solution)):
-            solution[i] -=1
+        def recurrence(best_solution):
 
-        rev_init, capacite_init = self.getTotal(data, solution)
+            minDensity = float('inf')
+            for idx1 in best_solution:
+                if R[idx1] < minDensity:
+                    minDensity = R[idx1]
+                    toRemove = idx1
 
-        optimum_local = False
-        i = 0
+            partial_solution = best_solution[:]
+            partial_solution.remove(toRemove)
+            spaceLeft = maxQ - sum(data[partial_solution, 1])
+            removedValue = data[toRemove, 0]
 
-        nb_de_poss = len(solution) * len(data)
+            # toTest = list(range(len(data)))
+            toTest = np.where(R > minDensity)[0]
 
-        while not optimum_local:
-            # on crée les solutions possibles
-            solution_allowed = []
-            for h in range(len(solution)):
-                solution_allowed.append(list(range(0, len(data))))
+            idx_toRemove = []
 
-            # on vide la matrice solution allowed pour trouver les optimums locaux
-            while len(solution_allowed) != 0:
+            for x in partial_solution:
+                idx_toRemove = np.append(idx_toRemove, np.where(toTest == x)[0])
 
-                i += 1
-                popIndex = []
-                targetIndex = []
+            toTest = np.delete(toTest, idx_toRemove)
+            toTestOrder = [x for _, x in sorted(zip(-R[toTest], toTest))]
 
-                solution_save = solution[:]
-                rev = rev_init
-                capacite = capacite_init
+            new_idx = []
+            i = 0
+            tracking = []
 
-                rand_iteration = random.choice([1,2])
-                if len(solution_allowed) == 1:
-                    rand_iteration = 1
-                for iter in range(rand_iteration):
+            while spaceLeft > 0 and i < len(toTest) - 1:
+                idx2 = toTestOrder[i]
+                if data[idx2, 1] <= spaceLeft:
+                    new_idx.append(idx2)
+                    spaceLeft -= data[idx2, 1]
+                    i += 1
+                    tracking.append(i)
 
-                    rev, capacite = self.chgmtSolution(data, solution, solution_allowed, rev, capacite, popIndex, targetIndex)
-
-                # on test nos nouvelles capacite et solution_allowed[popIndex[iter]][targetIndex[iter]]revenus
-                if capacite > maxQ or rev <= rev_init:
-
-                    for iter in range(len(popIndex)):
-                        del solution_allowed[popIndex[iter]][targetIndex[iter]]
-
-                    if capacite >= maxQ:
-                        solution = solution_save[:]
-
+                    if spaceLeft == 0 or i >= len(toTest) - 1:
+                        if np.sum(data[new_idx, 0]) < removedValue:
+                            new_idx = []
+                            spaceLeft = maxQ - sum(data[partial_solution, 1])
+                            i = tracking[0] + 1
+                            tracking = []
                 else:
-                    rev_init = rev
-                    capacite_init = capacite
+                    i += 1
 
-                popIndex.sort()
-                popIndex.reverse()
-                for iter in range(len(popIndex)):
-                    if len(solution_allowed[popIndex[iter]]) == 0:
-                        del solution_allowed[popIndex[iter]]
+            if len(new_idx) == 0:
+                new_solution = partial_solution[:]
 
-                if len(solution_allowed) == 0:
-                    optimum_local = True
+            else:
+                new_solution = sorted(np.append(partial_solution[:], new_idx))
 
-        return [x + 1 for x in sorted(solution[:])], rev_init
+            if sum(data[new_solution, 0]) <= sum(data[best_solution, 0]):
+
+                return best_solution
+            else:
+
+                best_solution = new_solution[:]
+                return recurrence(best_solution)
+
+        best_solution = recurrence(best_solution)
+
+        return [[x + 1 for x in best_solution], sum(data[best_solution, 0])]
 
 
 if __name__ == "__main__":

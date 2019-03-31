@@ -46,8 +46,8 @@ class Algorithme:
         revenus = 0
         capacite = 0
         for solution in solutions:
-            revenus += data[solution -1, 0]
-            capacite += data[solution -1, 1]
+            revenus += data[solution, 0]
+            capacite += data[solution, 1]
         return revenus, capacite
 
     def getRendement(self, solutions):
@@ -84,6 +84,13 @@ class Algorithme:
         return solution, result, time.time() - debut, maxQ
 
     def resolve(self, data, maxQ,  options = {"defaut": True}):
+        """
+        Resolution de l'algorithme visé
+        :param data: tableau des solutions possibles et revenus associés
+        :param maxQ: entier capacité maximal
+        :param options: array d'options
+        :return: array de solution, et revenus
+        """
         pass
 
     def optionsHandler(self, options = {"defaut": True}):
@@ -110,6 +117,6 @@ class Algorithme:
             if '-t' in options:  # On imprime le temps d'exécution
                 print(fin * 1000)
         else:
-            print("solution: {}\n revenus: {}\n temps de'exécution: {} ms".format(self.printArray(arrayRetour[0]),
+            print("solution: {}\n revenus: {}\n temps de'exécution: {} s".format(self.printArray(arrayRetour[0]),
                                                                                   arrayRetour[1],
                                                                                   fin * 1000))
